@@ -4,8 +4,13 @@ from PySide6.QtGui import QAction, QIcon
 from PySide6.QtCore import Qt, QSize
 import core.iso as iso
 
+# Global reference for context menus
+toolbar_actions_ref = []
+
 def add_toolbar(window):
     from ui.main_window import refresh_ui
+    global toolbar_actions_ref
+    toolbar_actions_ref.clear()
     
     toolbar = QToolBar("Main Toolbar")
     toolbar.setIconSize(QSize(32, 32))
@@ -104,5 +109,6 @@ def add_toolbar(window):
         action = toolbar.addAction(icon, text)
         if callback:
             action.triggered.connect(callback)
+            toolbar_actions_ref.append((text, callback))
             
     return toolbar

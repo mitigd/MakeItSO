@@ -1,24 +1,36 @@
-from PySide6.QtWidgets import QTreeView
+from PySide6.QtWidgets import QTreeView, QMenu
 from PySide6.QtGui import QStandardItemModel, QStandardItem, QIcon
+from PySide6.QtCore import Qt, QPoint
 
 def add_file_view(parent):
+    from ui.main_window import refresh_ui, get_registry
+    from PySide6.QtWidgets import QMenu
+    from PySide6.QtCore import QPoint
+    
     file_list = QTreeView(parent)
     file_list.setAlternatingRowColors(True)
     file_list.setSelectionMode(QTreeView.ExtendedSelection)
+    file_list.setContextMenuPolicy(Qt.CustomContextMenu)
+    
+    def open_context_menu(position: QPoint):
+        menu = QMenu()
+        
+        # We can reuse actions from toolbar if we expose them, but for now let's just add basic ones
+        from ui.toolbar import toolbar_actions_ref
+        
+        if toolbar_actions_ref:
+            for text, callback in toolbar_actions_ref:
+                if text in ["Add", "Extract", "Delete"]:
+                    action = menu.addAction(text)
+                    action.triggered.connect(callback)
+                    
+        menu.exec(file_list.viewport().mapToGlobal(position))
+
+    file_list.customContextMenuRequested.connect(open_context_menu)
     
     # Model with columns: Name, Size, Type, Modified
     model = QStandardItemModel()
     model.setHorizontalHeaderLabels(["Name", "Size", "Type", "Modified"])
-    
-    # Mock row
-    row = [
-        QStandardItem(QIcon.fromTheme("text-x-generic"), "readme.txt"),
-        QStandardItem("12 KB"),
-        QStandardItem("TXT File"),
-        QStandardItem("2024-03-25 10:00")
-    ]
-    model.appendRow(row)
-    
     file_list.setModel(model)
     file_list.setColumnWidth(0, 250)
     

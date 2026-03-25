@@ -6,7 +6,9 @@ _state = {
     'iso': None,
     'path': None,
     'current_dir': '/',
-    'is_loaded': False
+    'is_loaded': False,
+    'back_stack': [],
+    'forward_stack': []
 }
 
 def new_iso():
@@ -150,6 +152,34 @@ def remove_item(iso_path, is_dir=False):
     except Exception as e:
         print(f"Error removing item: {e}")
         return False
+
+def set_current_dir(path, push_history=True):
+    if not _state['is_loaded']: return
+    if push_history and path != _state['current_dir']:
+        _state['back_stack'].append(_state['current_dir'])
+        _state['forward_stack'].clear()
+    _state['current_dir'] = path
+
+def go_up():
+    if not _state['is_loaded']: return
+    if _state['current_dir'] == '/': return
+    
+    parts = _state['current_dir'].rstrip('/').split('/')
+    new_path = '/'
+    if len(parts) > 1:
+        new_path = '/'.join(parts[:-1])
+    
+    set_current_dir(new_path)
+
+def go_back():
+    if not _state['back_stack']: return
+    _state['forward_stack'].append(_state['current_dir'])
+    _state['current_dir'] = _state['back_stack'].pop()
+
+def go_forward():
+    if not _state['forward_stack']: return
+    _state['back_stack'].append(_state['current_dir'])
+    _state['current_dir'] = _state['forward_stack'].pop()
 
 def get_state():
     return _state
