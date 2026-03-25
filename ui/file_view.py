@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QTreeView, QMenu
+from PySide6.QtWidgets import QTreeView, QMenu, QHeaderView
 from PySide6.QtGui import QStandardItemModel, QStandardItem, QIcon
 from PySide6.QtCore import Qt, QPoint
 
@@ -34,6 +34,15 @@ def add_file_view(parent):
     model = QStandardItemModel()
     model.setHorizontalHeaderLabels(["Name", "Size", "Type", "Modified"])
     file_list.setModel(model)
+    
+    header = file_list.header()
+    header.setSectionResizeMode(0, QHeaderView.Stretch)
+    header.setSectionResizeMode(1, QHeaderView.Interactive)
+    header.setSectionResizeMode(2, QHeaderView.Interactive)
+    header.setSectionResizeMode(3, QHeaderView.Interactive)
+    
     file_list.setColumnWidth(0, 250)
+    file_list.setColumnWidth(1, 100)
+    file_list.setColumnWidth(2, 100)
     
     return file_list

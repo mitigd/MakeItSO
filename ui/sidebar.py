@@ -47,6 +47,7 @@ def refresh_sidebar():
 def add_sidebar(parent):
     tree_view = QTreeView(parent)
     tree_view.setHeaderHidden(True)
+    tree_view.setMinimumWidth(200)
     
     model = QStandardItemModel()
     tree_view.setModel(model)

@@ -75,8 +75,8 @@ def refresh_ui():
 
 def create_main_window():
     window = QMainWindow()
-    window.setWindowTitle("MakeSo - [New ISO]")
-    window.resize(1000, 700)
+    window.setWindowTitle("MakeItSO - [No ISO]")
+    window.setMinimumSize(1000, 680)
     
     central_widget = QWidget()
     window.setCentralWidget(central_widget)
