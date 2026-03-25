@@ -272,3 +272,41 @@ def go_forward():
 
 def get_state():
     return _state
+
+def get_total_size():
+    """Calculate the total size of all files in the ISO."""
+    if not _state['is_loaded']: return 0
+    iso_obj = _state['iso']
+    
+    # Baseline from disk if it's a known file (catches 360/multi-session sizes)
+    disk_size = 0
+    if _state['path'] and os.path.exists(_state['path']):
+        disk_size = os.path.getsize(_state['path'])
+        
+    walker_total = 0
+    def walk(p):
+        nonlocal walker_total
+        try:
+            kwargs = {}
+            if iso_obj.has_joliet(): kwargs['joliet_path'] = p
+            elif iso_obj.has_rock_ridge(): kwargs['rock_ridge_path'] = p
+            else: kwargs['iso_path'] = p
+            
+            for entry in iso_obj.list_children(**kwargs):
+                if entry.is_dot() or entry.is_dotdot(): continue
+                if entry.is_dir():
+                    name = None
+                    if iso_obj.has_joliet():
+                        try: name = entry.file_identifier().decode('utf-16be').replace('\x00', '')
+                        except: pass
+                    if not name:
+                        name = entry.file_identifier().decode('utf-8', errors='replace')
+                    if ';' in name: name = name.split(';')[0]
+                    walk(f"{p.rstrip('/')}/{name}")
+                else:
+                    walker_total += entry.data_length
+        except: pass
+        
+    walk('/')
+    # Return the larger of the two (handles hidden partitions vs new additions)
+    return max(disk_size, walker_total)

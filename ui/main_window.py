@@ -69,9 +69,36 @@ def refresh_ui():
         model.appendRow(row)
         total_size += item['size']
         
-    # Update Status
+    # Refresh Status Bar Usage
+    from core.iso import get_total_size
+    total_bytes = get_total_size()
+    total_mb = total_bytes / (1024 * 1024)
+    print(f"DEBUG: Total Bytes: {total_bytes}, Total MB: {total_mb:.2f}")
+    
+    # Dynamic capacity tiering
+    if total_mb <= 700: max_mb = 700
+    elif total_mb <= 4700: max_mb = 4700
+    elif total_mb <= 8500: max_mb = 8500
+    else: max_mb = 25000
+    
+    # Count objects in current dir
+    count = len([i for i in items if i['name'] != '..'])
+    
+    status_text = f"Total: {count} objects, {total_mb:.2f} MB / {max_mb} MB"
     if reg['status_label']:
-        reg['status_label'].setText(f"Total: {len(items)} objects, {total_size / 1024:.1f} KB - Path: {state['current_dir']}")
+        reg['status_label'].setText(status_text)
+    
+    if reg['progress_bar']:
+        percent = int((total_mb / max_mb) * 100)
+        reg['progress_bar'].setValue(min(percent, 100))
+        reg['progress_bar'].setToolTip(f"{percent}% of {max_mb} MB used")
+        # Color based on usage (Premium touch)
+        if percent > 90:
+            reg['progress_bar'].setStyleSheet("QProgressBar::chunk { background-color: #e81123; }") # Red
+        elif percent > 75:
+            reg['progress_bar'].setStyleSheet("QProgressBar::chunk { background-color: #ffb900; }") # Yellow
+        else:
+            reg['progress_bar'].setStyleSheet("QProgressBar::chunk { background-color: #007acc; }") # Blue
 
 def create_main_window():
     window = QMainWindow()
