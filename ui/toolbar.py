@@ -1,3 +1,5 @@
+import os
+import tempfile
 from PySide6.QtWidgets import QToolBar, QToolButton, QFileDialog, QApplication
 from PySide6.QtGui import QAction, QIcon
 from PySide6.QtCore import Qt, QSize

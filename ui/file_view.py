@@ -14,13 +14,15 @@ def add_file_view(parent):
     
     def open_context_menu(position: QPoint):
         menu = QMenu()
-        
-        # We can reuse actions from toolbar if we expose them, but for now let's just add basic ones
         from ui.toolbar import toolbar_actions_ref
         
         if toolbar_actions_ref:
+            # Grouping actions: [Add], [Extract, Copy], [Delete]
             for text, callback in toolbar_actions_ref:
-                if text in ["Add", "Extract", "Delete"]:
+                if text in ["Add", "Extract", "Copy", "Delete"]:
+                    if text == "Extract": menu.addSeparator()
+                    if text == "Delete": menu.addSeparator()
+                    
                     action = menu.addAction(text)
                     action.triggered.connect(callback)
                     
