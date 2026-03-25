@@ -1,0 +1,24 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer Disc -->
+  <circle cx="128" cy="128" r="120" fill="#2d2d2d" stroke="#007acc" stroke-width="8"/>
+  <circle cx="128" cy="128" r="110" fill="url(#disc_gradient)"/>
+  
+  <!-- Shiny Reflection -->
+  <path d="M128 18C67.2487 18 18 67.2487 18 128C18 158.376 30.3117 185.876 50.2117 205.776" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+  
+  <!-- Inner Hole -->
+  <circle cx="128" cy="128" r="30" fill="#1e1e1e" stroke="#3c3c3c" stroke-width="4"/>
+  <circle cx="128" cy="128" r="15" fill="#000000"/>
+
+  <!-- MakeSo 'M' Accent -->
+  <path d="M110 120L128 140L146 120" stroke="#007acc" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M100 150L128 110L156 150" stroke="#007acc" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+
+  <defs>
+    <radialGradient id="disc_gradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(128 128) rotate(90) scale(110)">
+      <stop offset="0" stop-color="#3c3c3c"/>
+      <stop offset="0.7" stop-color="#2d2d2d"/>
+      <stop offset="1" stop-color="#1e1e1e"/>
+    </radialGradient>
+  </defs>
+</svg>
