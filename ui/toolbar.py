@@ -13,8 +13,10 @@ def add_toolbar(window):
     
     toolbar = QToolBar("Main Toolbar")
     toolbar.setIconSize(QSize(32, 32))
+    toolbar.setMovable(False)
+    toolbar.setAllowedAreas(Qt.LeftToolBarArea)
+    window.addToolBar(Qt.LeftToolBarArea, toolbar)
     toolbar.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-    window.addToolBar(toolbar)
     
     def on_new():
         iso.new_iso()
