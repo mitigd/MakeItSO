@@ -1,5 +1,4 @@
-import os
-from PySide6.QtWidgets import QToolBar, QToolButton, QFileDialog
+from PySide6.QtWidgets import QToolBar, QToolButton, QFileDialog, QApplication
 from PySide6.QtGui import QAction, QIcon
 from PySide6.QtCore import Qt, QSize
 import core.iso as iso
@@ -8,7 +7,7 @@ import core.iso as iso
 toolbar_actions_ref = []
 
 def add_toolbar(window):
-    from ui.main_window import refresh_ui
+    from ui.main_window import refresh_ui, get_registry
     global toolbar_actions_ref
     toolbar_actions_ref.clear()
     
@@ -62,24 +61,41 @@ def add_toolbar(window):
             refresh_ui()
 
     def on_extract():
+        from PySide6.QtWidgets import QProgressDialog
         reg = get_registry()
         view = reg['file_view']
         indices = view.selectionModel().selectedRows()
-        if indices:
+        
+        save_dir = QFileDialog.getExistingDirectory(window, "Extract to Directory")
+        if not save_dir:
+            return
+            
+        progress = QProgressDialog("Extracting files...", "Cancel", 0, 100, window)
+        progress.setWindowModality(Qt.WindowModal)
+        progress.show()
+
+        def update_progress(name):
+            progress.setLabelText(f"Extracting: {name}")
+            QApplication.processEvents()
+
+        if not indices:
+            # Extract everything
+            iso.extract_all(save_dir, progress_callback=update_progress)
+        else:
+            # Extract selected indices
             model = view.model()
-            save_dir = QFileDialog.getExistingDirectory(window, "Extract to Directory")
-            if save_dir:
-                for index in indices:
-                    name = model.item(index.row(), 0).text()
-                    # In pycdlib, we need to extract to a local file
-                    local_path = os.path.join(save_dir, name)
-                    # Simplified extraction logic
-                    # This would need more robust handling in a real app
-                    try:
-                        iso.get_state()['iso'].get_file_from_joliet_path(local_path, joliet_path=f"/{name}")
-                    except:
-                        pass
-                refresh_ui()
+            state = iso.get_state()
+            for i, index in enumerate(indices):
+                if progress.wasCanceled(): break
+                name = model.item(index.row(), 0).text()
+                iso_path = f"{state['current_dir'].rstrip('/')}/{name}"
+                dest_path = os.path.join(save_dir, name)
+                iso.extract_item(iso_path, dest_path)
+                update_progress(name)
+                progress.setValue(int((i+1)/len(indices) * 100))
+        
+        progress.setValue(100)
+        refresh_ui()
 
     # Actions
     actions = [

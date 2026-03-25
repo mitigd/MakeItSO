@@ -35,12 +35,11 @@ def refresh_sidebar():
 
     def on_sidebar_clicked(index):
         path = model.itemFromIndex(index).data()
+        print(f"Sidebar clicked: {path}")
         set_current_dir(path)
         refresh_ui()
         
-    # Re-connect (Disconnect first to avoid duplicates)
-    try: view.clicked.disconnect()
-    except: pass
+    # Re-connect (Disconnect only if same view)
     view.clicked.connect(on_sidebar_clicked)
     
     view.expandAll()

@@ -1,4 +1,5 @@
 import pycdlib
+import os
 from datetime import datetime
 
 # Global state for the ISO
@@ -169,13 +170,69 @@ def get_dir_tree(path='/'):
             
             for entry in iso_obj.list_children(**kwargs):
                 if entry.is_dir() and not entry.is_dot() and not entry.is_dotdot():
-                    full_path = f"{p.rstrip('/')}/{entry.file_identifier().decode('utf-16be' if iso_obj.has_joliet() else 'utf-8').replace('\x00','')}".split(';')[0]
+                    null_char = '\x00'
+                    ident = entry.file_identifier().decode('utf-16be' if iso_obj.has_joliet() else 'utf-8').replace(null_char, '')
+                    full_path = f"{p.rstrip('/')}/{ident}".split(';')[0]
                     dirs.append(full_path)
                     walk(full_path)
         except: pass
         
     walk('/')
     return sorted(list(set(dirs)))
+
+def extract_item(iso_path, local_dest):
+    """Extract a single file (simplified) to a local path."""
+    if not _state['is_loaded']: return False
+    iso_obj = _state['iso']
+    try:
+        kwargs = {}
+        if iso_obj.has_joliet(): kwargs['joliet_path'] = iso_path
+        elif iso_obj.has_rock_ridge(): kwargs['rock_ridge_path'] = iso_path
+        else: kwargs['iso_path'] = iso_path
+        
+        iso_obj.get_file_from_iso(local_dest, **kwargs)
+        return True
+    except Exception as e:
+        print(f"Error extracting {iso_path}: {e}")
+        return False
+
+def extract_all(dest_dir, progress_callback=None):
+    """Recursively extract all files with optional progress callback."""
+    if not _state['is_loaded']: return False
+    iso_obj = _state['iso']
+    
+    # Pre-count files for progress if possible
+    # (Simplified: we'll just emit progress per file)
+    
+    def extract_walk(p):
+        try:
+            kwargs = {}
+            if iso_obj.has_joliet(): kwargs['joliet_path'] = p
+            elif iso_obj.has_rock_ridge(): kwargs['rock_ridge_path'] = p
+            else: kwargs['iso_path'] = p
+            
+            items = list(iso_obj.list_children(**kwargs))
+            for entry in items:
+                if entry.is_dot() or entry.is_dotdot(): continue
+                
+                null_char = '\x00'
+                name = entry.file_identifier().decode('utf-16be' if iso_obj.has_joliet() else 'utf-8').replace(null_char, '').split(';')[0]
+                
+                rel_path = f"{p.rstrip('/')}/{name}"
+                local_path = os.path.join(dest_dir, rel_path.lstrip('/'))
+                
+                if entry.is_dir():
+                    os.makedirs(local_path, exist_ok=True)
+                    extract_walk(rel_path)
+                else:
+                    os.makedirs(os.path.dirname(local_path), exist_ok=True)
+                    extract_item(rel_path, local_path)
+                    if progress_callback:
+                        progress_callback(name)
+        except: pass
+        
+    extract_walk('/')
+    return True
 
 def set_current_dir(path, push_history=True):
     if not _state['is_loaded']: return
