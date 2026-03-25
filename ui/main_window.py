@@ -27,11 +27,11 @@ def refresh_ui():
     reg = get_registry()
     
     if not state['is_loaded']:
-        reg['window'].setWindowTitle("MakeSo - [No ISO]")
+        reg['window'].setWindowTitle("MakeItSO - [No ISO]")
         return
 
     # Update title and path bar
-    title = f"MakeSo - [{state['path'] if state['path'] else 'Unsaved ISO'}]"
+    title = f"MakeItSO - [{state['path'] if state['path'] else 'Unsaved ISO'}]"
     reg['window'].setWindowTitle(title)
     if reg['path_edit']:
         reg['path_edit'].setText(state['current_dir'])
