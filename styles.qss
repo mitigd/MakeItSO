@@ -1,0 +1,74 @@
+/* Professional Professional Styles for MakeSo */
+QMainWindow {
+    background-color: #f5f6f7;
+}
+
+QToolBar {
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ffffff, stop:1 #e8e9eb);
+    border-bottom: 1px solid #c0c2c4;
+    padding: 10px;
+    spacing: 15px;
+}
+
+QToolButton {
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 5px;
+    color: #333;
+    font-family: "Segoe UI", sans-serif;
+    font-size: 11px;
+}
+
+QToolButton:hover {
+    background-color: rgba(0, 120, 215, 0.1);
+    border: 1px solid rgba(0, 120, 215, 0.3);
+}
+
+QTreeView, QHeaderView::section {
+    background-color: white;
+    border: none;
+    font-family: "Segoe UI", sans-serif;
+}
+
+QTreeView {
+    border: 1px solid #d0d0d0;
+}
+
+QHeaderView::section {
+    background-color: #f0f0f0;
+    padding: 4px;
+    border-right: 1px solid #d0d0d0;
+    border-bottom: 1px solid #d0d0d0;
+}
+
+QStatusBar {
+    background-color: #f0f0f0;
+    border-top: 1px solid #c0c2c4;
+}
+
+QProgressBar {
+    border: 1px solid #bbb;
+    border-radius: 2px;
+    text-align: center;
+    background: #e0e0e0;
+}
+
+QProgressBar::chunk {
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #4caf50, stop:1 #2e7d32);
+    width: 10px;
+    margin: 0.5px;
+}
+
+/* Nav Bar area */
+#navBar {
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #d0d0d0;
+    padding: 5px;
+}
+
+QLineEdit#pathEdit {
+    border: 1px solid #ccc;
+    padding: 3px;
+    border-radius: 2px;
+}
