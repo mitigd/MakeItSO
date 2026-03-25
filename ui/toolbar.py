@@ -99,6 +99,39 @@ def add_toolbar(window):
         progress.setValue(100)
         refresh_ui()
 
+    def on_copy():
+        from PySide6.QtCore import QMimeData, QUrl
+        reg = get_registry()
+        view = reg['file_view']
+        indices = view.selectionModel().selectedRows()
+        if not indices: return
+        
+        model = view.model()
+        state = iso.get_state()
+        
+        # We'll extract to a temp folder and put URIs on clipboard
+        import tempfile
+        temp_dir = os.path.join(tempfile.gettempdir(), "MakeSo_Clipboard")
+        os.makedirs(temp_dir, exist_ok=True)
+        
+        urls = []
+        for index in indices:
+            name = model.item(index.row(), 0).text()
+            iso_path = f"{state['current_dir'].rstrip('/')}/{name}"
+            local_path = os.path.join(temp_dir, name)
+            
+            # Simple extraction (for now files only in this version)
+            if iso.extract_item(iso_path, local_path):
+                urls.append(QUrl.fromLocalFile(local_path))
+        
+        if urls:
+            mime_data = QMimeData()
+            mime_data.setUrls(urls)
+            QApplication.clipboard().setMimeData(mime_data)
+            # Optional: Feedback on status bar
+            if reg['status_label']:
+                reg['status_label'].setText(f"Copied {len(urls)} items to clipboard.")
+
     # Actions
     actions = [
         ("New", "document-new", on_new),
@@ -110,10 +143,7 @@ def add_toolbar(window):
         ("Extract", "document-export", on_extract),
         ("Delete", "list-remove", on_delete),
         (None, None, None),
-        ("Copy", "edit-copy", None),
-        ("Compress", "package-x-generic", None),
-        ("Burn", "media-optical-burn", None),
-        ("Mount", "media-mount", None),
+        ("Copy", "edit-copy", on_copy),
         (None, None, None),
         ("Help", "help-browser", None)
     ]
