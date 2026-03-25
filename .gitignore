@@ -42,7 +42,6 @@ ENV/
 extracted/
 *.iso
 .synapse/
-*.jpg
 check_*.py
 inspect_*.py
 test_*.py
