@@ -153,6 +153,30 @@ def remove_item(iso_path, is_dir=False):
         print(f"Error removing item: {e}")
         return False
 
+def get_dir_tree(path='/'):
+    """Return a flat list of all directory paths in the ISO."""
+    if not _state['is_loaded']: return []
+    
+    dirs = ['/']
+    iso_obj = _state['iso']
+    
+    def walk(p):
+        try:
+            kwargs = {}
+            if iso_obj.has_joliet(): kwargs['joliet_path'] = p
+            elif iso_obj.has_rock_ridge(): kwargs['rock_ridge_path'] = p
+            else: kwargs['iso_path'] = p
+            
+            for entry in iso_obj.list_children(**kwargs):
+                if entry.is_dir() and not entry.is_dot() and not entry.is_dotdot():
+                    full_path = f"{p.rstrip('/')}/{entry.file_identifier().decode('utf-16be' if iso_obj.has_joliet() else 'utf-8').replace('\x00','')}".split(';')[0]
+                    dirs.append(full_path)
+                    walk(full_path)
+        except: pass
+        
+    walk('/')
+    return sorted(list(set(dirs)))
+
 def set_current_dir(path, push_history=True):
     if not _state['is_loaded']: return
     if push_history and path != _state['current_dir']:
