@@ -89,11 +89,19 @@ def list_dir(path=None):
             if ';' in name:
                 name = name.split(';')[0]
             
+            # Extract actual modification time robustly
+            try:
+                dt = entry.date
+                year = 1900 + dt.years_since_1900
+                modified_str = f"{year:04}-{dt.month:02}-{dt.day_of_month:02} {dt.hour:02}:{dt.minute:02}:{dt.second:02}"
+            except Exception:
+                modified_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
             items.append({
                 'name': name,
                 'is_dir': entry.is_dir(),
                 'size': entry.data_length,
-                'modified': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                'modified': modified_str
             })
     except Exception as e:
         print(f"Error listing {target_path} with {kwargs}: {e}")
