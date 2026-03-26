@@ -4,7 +4,7 @@ MakeItSO is a professional ISO editor built using PySide6 and pycdlib. It provid
 
 ![MakeItSO](assets/MakeItSO.jpg)
 
-![App](assets/App.jpg)
+![App](assets/App.png)
 
 ## Features
 
